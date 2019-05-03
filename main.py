@@ -23,7 +23,7 @@ def convert_array(text):
 sqlite3.register_adapter(np.ndarray, adapt_array)
 sqlite3.register_converter("array", convert_array)
 vgg_face_descriptor = loadVggFaceModel()
-epsilon = 60
+epsilon = 50.0
 
 print('Do you want to verify? (y/n)')
 condition = True if input() == 'y' else False
@@ -44,10 +44,13 @@ while condition:
     cursor = conn.execute("SELECT * FROM Students")
     for img in representations:
         for row in cursor:
-            img_rep = row[2]
-            euclidean_distance = findEuclideanDistance(img, img_rep)
-            if euclidean_distance < epsilon:
+            average_euclidean_distance = 0.0
+            for i in range(2,12):
+                img_rep = row[i]
+                average_euclidean_distance += float(findEuclideanDistance(img, img_rep))
+            average_euclidean_distance /= 10.0
+            if average_euclidean_distance < epsilon:
                 print("Hello "+row[1]+" !")
-                print(euclidean_distance)
+                print(average_euclidean_distance)
     print("Do you want to continue? (y/n)")
     condition = True if input() == 'y' else False
